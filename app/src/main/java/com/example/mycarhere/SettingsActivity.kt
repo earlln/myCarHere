@@ -21,10 +21,9 @@ class SettingsActivity : AppCompatActivity() {
         binding = ActivitySettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Load current settings
+        // Load current settings — SeekBar: progress 0..29 → value 1..30
         val secs = recordSeconds
-        // SeekBar: 0..25 → 1..30 offset +5 wait: progress = secs - 5, clamped to 0..25
-        binding.seekBarRecordTime.progress = (secs - 5).coerceIn(0, 25)
+        binding.seekBarRecordTime.progress = (secs - 1).coerceIn(0, 29)
         binding.tvRecordTimeValue.text = "${secs}초"
 
         binding.switchMultiLocation.isChecked = allowMultiLocation
@@ -33,8 +32,7 @@ class SettingsActivity : AppCompatActivity() {
 
         binding.seekBarRecordTime.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(sb: SeekBar, progress: Int, fromUser: Boolean) {
-                val v = progress + 5   // 5..30
-                binding.tvRecordTimeValue.text = "${v}초"
+                binding.tvRecordTimeValue.text = "${progress + 1}초"
             }
             override fun onStartTrackingTouch(sb: SeekBar) {}
             override fun onStopTrackingTouch(sb: SeekBar) {}
@@ -45,7 +43,7 @@ class SettingsActivity : AppCompatActivity() {
         }
 
         binding.btnSaveSettings.setOnClickListener {
-            val secs = binding.seekBarRecordTime.progress + 5
+            val secs = binding.seekBarRecordTime.progress + 1
             recordSeconds = secs
             allowMultiLocation = binding.switchMultiLocation.isChecked
             allowMultiPhoto = binding.switchMultiPhoto.isChecked

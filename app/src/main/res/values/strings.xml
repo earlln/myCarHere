@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">myCarHere</string>
+    <string name="app_name">myCarEarlln</string>
     <string name="no_record">저장된 정보가 없습니다</string>
     <string name="location">장소</string>
     <string name="photo">사진</string>

@@ -74,6 +74,9 @@ class MainActivity : AppCompatActivity() {
 
         db = AppDatabase.get(this)
 
+        val versionName = packageManager.getPackageInfo(packageName, 0).versionName
+        binding.tvVersion.text = "v$versionName"
+
         setupClickListeners()
         loadLastRecord()
     }
