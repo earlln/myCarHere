@@ -30,7 +30,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="🎤 자동 녹음 시간"
-                    android:textSize="15sp"
+                    android:textSize="17sp"
                     android:textStyle="bold"
                     android:textColor="@color/text_primary"/>
 
@@ -38,16 +38,16 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="앱 실행 시 자동 녹음 시간 (초)"
-                    android:textSize="12sp"
+                    android:textSize="14sp"
                     android:textColor="@color/text_secondary"
-                    android:layout_marginTop="2dp"/>
+                    android:layout_marginTop="4dp"/>
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:orientation="horizontal"
                     android:gravity="center_vertical"
-                    android:layout_marginTop="12dp">
+                    android:layout_marginTop="14dp">
 
                     <SeekBar
                         android:id="@+id/seekBarRecordTime"
@@ -59,10 +59,10 @@
 
                     <TextView
                         android:id="@+id/tvRecordTimeValue"
-                        android:layout_width="50dp"
+                        android:layout_width="56dp"
                         android:layout_height="wrap_content"
                         android:text="5초"
-                        android:textSize="16sp"
+                        android:textSize="18sp"
                         android:textStyle="bold"
                         android:textColor="@color/primary"
                         android:gravity="center"
@@ -72,10 +72,10 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="범위: 1~30초"
-                    android:textSize="11sp"
+                    android:text="범위: 5~30초"
+                    android:textSize="13sp"
                     android:textColor="@color/text_secondary"
-                    android:layout_marginTop="4dp"/>
+                    android:layout_marginTop="6dp"/>
             </LinearLayout>
         </androidx.cardview.widget.CardView>
 
@@ -97,7 +97,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="⚙️ 중복 저장 설정"
-                    android:textSize="15sp"
+                    android:textSize="17sp"
                     android:textStyle="bold"
                     android:textColor="@color/text_primary"/>
 
@@ -105,15 +105,15 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="각 항목을 복수 개 저장할 수 있습니다"
-                    android:textSize="12sp"
+                    android:textSize="14sp"
                     android:textColor="@color/text_secondary"
                     android:layout_marginBottom="12dp"
-                    android:layout_marginTop="2dp"/>
+                    android:layout_marginTop="4dp"/>
 
                 <!-- Allow multiple locations -->
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
+                    android:layout_height="52dp"
                     android:orientation="horizontal"
                     android:gravity="center_vertical">
 
@@ -122,7 +122,8 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="📍 여러 장소 선택 허용"
-                        android:textSize="14sp"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
                         android:textColor="@color/text_primary"/>
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
@@ -137,7 +138,7 @@
                 <!-- Allow multiple photos -->
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
+                    android:layout_height="52dp"
                     android:orientation="horizontal"
                     android:gravity="center_vertical">
 
@@ -146,7 +147,8 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="📷 여러 사진 저장 허용"
-                        android:textSize="14sp"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
                         android:textColor="@color/text_primary"/>
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
@@ -161,7 +163,7 @@
                 <!-- Allow multiple voice -->
                 <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
+                    android:layout_height="52dp"
                     android:orientation="horizontal"
                     android:gravity="center_vertical">
 
@@ -170,7 +172,8 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="🎤 여러 음성 저장 허용"
-                        android:textSize="14sp"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
                         android:textColor="@color/text_primary"/>
 
                     <com.google.android.material.switchmaterial.SwitchMaterial
@@ -206,23 +209,24 @@
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
                         android:text="📋 장소 리스트 관리"
-                        android:textSize="15sp"
+                        android:textSize="17sp"
                         android:textStyle="bold"
                         android:textColor="@color/text_primary"/>
 
                     <Button
                         android:id="@+id/btnManagePlaces"
                         android:layout_width="wrap_content"
-                        android:layout_height="36dp"
+                        android:layout_height="40dp"
                         android:text="관리 →"
-                        android:textSize="13sp"/>
+                        android:textSize="14sp"
+                        android:textStyle="bold"/>
                 </LinearLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="장소를 추가, 수정, 삭제할 수 있습니다"
-                    android:textSize="12sp"
+                    android:textSize="14sp"
                     android:textColor="@color/text_secondary"
                     android:layout_marginTop="4dp"/>
             </LinearLayout>
@@ -232,9 +236,9 @@
         <Button
             android:id="@+id/btnSaveSettings"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
+            android:layout_height="58dp"
             android:text="설정 저장"
-            android:textSize="16sp"
+            android:textSize="17sp"
             android:textStyle="bold"
             android:backgroundTint="@color/primary"
             android:layout_marginTop="8dp"/>

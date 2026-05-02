@@ -11,8 +11,8 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.os.Environment
-import android.provider.MediaStore
 import android.view.View
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -27,31 +27,23 @@ import com.example.mycarhere.Prefs.recordSeconds
 import com.example.mycarhere.databinding.ActivityMainBinding
 import kotlinx.coroutines.launch
 import java.io.File
-import java.text.SimpleDateFormat
-import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
     private lateinit var db: AppDatabase
 
-    // Current state
     private val selectedLocations = mutableSetOf<String>()
     private val photoPaths = mutableListOf<String>()
     private val audioPaths = mutableListOf<String>()
 
-    // Recording
     private var mediaRecorder: MediaRecorder? = null
     private var countDownTimer: CountDownTimer? = null
     private var currentAudioPath: String? = null
 
-    // Playback
     private var mediaPlayer: MediaPlayer? = null
 
-    // Camera
     private var pendingPhotoPath: String? = null
-
-    // ─── Activity Result Launchers ────────────────────────────
 
     private val cameraLauncher = registerForActivityResult(
         ActivityResultContracts.TakePicture()
@@ -74,8 +66,6 @@ class MainActivity : AppCompatActivity() {
         if (cameraGranted) launchCamera()
     }
 
-    // ─── Lifecycle ────────────────────────────────────────────
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         supportActionBar?.hide()
@@ -94,39 +84,17 @@ class MainActivity : AppCompatActivity() {
         mediaPlayer?.release()
     }
 
-    // ─── Setup ───────────────────────────────────────────────
-
     private fun setupClickListeners() {
         binding.btnSettings.setOnClickListener {
             startActivity(Intent(this, SettingsActivity::class.java))
         }
-
-        binding.btnSelectLocation.setOnClickListener {
-            showLocationDialog()
-        }
-
-        binding.btnTakePhoto.setOnClickListener {
-            requestCameraAndShoot()
-        }
-
-        binding.btnRecordVoice.setOnClickListener {
-            requestAudioAndRecord()
-        }
-
-        binding.btnStopRecording.setOnClickListener {
-            stopRecording(save = true)
-        }
-
-        binding.btnPlayVoice.setOnClickListener {
-            playLatestAudio()
-        }
-
-        binding.btnClearAll.setOnClickListener {
-            confirmClearAll()
-        }
+        binding.btnSelectLocation.setOnClickListener { showLocationDialog() }
+        binding.btnTakePhoto.setOnClickListener { requestCameraAndShoot() }
+        binding.btnRecordVoice.setOnClickListener { requestAudioAndRecord() }
+        binding.btnStopRecording.setOnClickListener { stopRecording(save = true) }
+        binding.btnPlayVoice.setOnClickListener { playLatestAudio() }
+        binding.btnClearAll.setOnClickListener { confirmClearAll() }
     }
-
-    // ─── Load saved data ──────────────────────────────────────
 
     private fun loadLastRecord() {
         lifecycleScope.launch {
@@ -150,33 +118,27 @@ class MainActivity : AppCompatActivity() {
 
                 updateStatusUI()
 
-                // Auto-play latest audio if exists
                 if (audioPaths.isNotEmpty()) {
-                    playLatestAudio()
+                    // 앱 실행 시 저장된 음성 자동 재생
+                    binding.root.postDelayed({ playLatestAudio() }, 400)
                 } else {
-                    // No audio saved → start auto recording
                     scheduleAutoRecord()
                 }
             } else {
-                // First launch → start auto recording
                 scheduleAutoRecord()
             }
         }
     }
 
     private fun scheduleAutoRecord() {
-        // Small delay so UI is ready
         binding.root.postDelayed({ requestAudioAndRecord(isAuto = true) }, 600)
     }
 
-    // ─── Status UI ───────────────────────────────────────────
-
     private fun updateStatusUI() {
-        // Location
         if (selectedLocations.isEmpty() && photoPaths.isEmpty() && audioPaths.isEmpty()) {
             binding.tvLastLocation.text = "저장된 정보가 없습니다"
             binding.layoutStatusIcons.visibility = View.GONE
-            binding.ivPhotoThumb.visibility = View.GONE
+            binding.scrollPhotos.visibility = View.GONE
             binding.btnPlayVoice.visibility = View.GONE
             return
         }
@@ -184,27 +146,36 @@ class MainActivity : AppCompatActivity() {
         binding.tvLastLocation.text = if (selectedLocations.isEmpty())
             "(장소 미선택)" else selectedLocations.joinToString(", ")
 
-        // Badges
         binding.layoutStatusIcons.visibility = View.VISIBLE
         binding.tvHasPhoto.visibility = if (photoPaths.isNotEmpty()) View.VISIBLE else View.GONE
         binding.tvHasVoice.visibility = if (audioPaths.isNotEmpty()) View.VISIBLE else View.GONE
 
-        // Photo thumbnail (latest)
+        // 여러 사진 썸네일 — 가로 스크롤
+        binding.layoutPhotos.removeAllViews()
         if (photoPaths.isNotEmpty()) {
-            val bmp = BitmapFactory.decodeFile(photoPaths.last())
-            if (bmp != null) {
-                binding.ivPhotoThumb.setImageBitmap(bmp)
-                binding.ivPhotoThumb.visibility = View.VISIBLE
+            val density = resources.displayMetrics.density
+            val thumbWidth = (140 * density).toInt()
+            val thumbHeight = binding.scrollPhotos.layoutParams.height
+            val margin = (6 * density).toInt()
+
+            for (path in photoPaths) {
+                val bmp = BitmapFactory.decodeFile(path) ?: continue
+                val iv = ImageView(this).apply {
+                    layoutParams = android.widget.LinearLayout.LayoutParams(thumbWidth, thumbHeight).also {
+                        it.marginEnd = margin
+                    }
+                    scaleType = ImageView.ScaleType.CENTER_CROP
+                    setImageBitmap(bmp)
+                }
+                binding.layoutPhotos.addView(iv)
             }
+            binding.scrollPhotos.visibility = View.VISIBLE
         } else {
-            binding.ivPhotoThumb.visibility = View.GONE
+            binding.scrollPhotos.visibility = View.GONE
         }
 
-        // Voice play button
         binding.btnPlayVoice.visibility = if (audioPaths.isNotEmpty()) View.VISIBLE else View.GONE
     }
-
-    // ─── Location Dialog ─────────────────────────────────────
 
     private fun showLocationDialog() {
         lifecycleScope.launch {
@@ -225,13 +196,12 @@ class MainActivity : AppCompatActivity() {
             val dialogView = layoutInflater.inflate(R.layout.dialog_select_location, null)
             val recycler = dialogView.findViewById<androidx.recyclerview.widget.RecyclerView>(R.id.recyclerLocations)
             recycler.layoutManager = LinearLayoutManager(this@MainActivity)
-            val adapter = LocationChoiceAdapter(
+            recycler.adapter = LocationChoiceAdapter(
                 items = places,
                 selectedNames = tempSelected,
                 multiSelect = allowMultiLocation,
                 onPick = {}
             )
-            recycler.adapter = adapter
 
             AlertDialog.Builder(this@MainActivity)
                 .setTitle("📍 장소 선택")
@@ -246,8 +216,6 @@ class MainActivity : AppCompatActivity() {
                 .show()
         }
     }
-
-    // ─── Camera ──────────────────────────────────────────────
 
     private fun requestCameraAndShoot() {
         when {
@@ -265,8 +233,6 @@ class MainActivity : AppCompatActivity() {
         cameraLauncher.launch(uri)
     }
 
-    // ─── Audio Recording ─────────────────────────────────────
-
     private fun requestAudioAndRecord(isAuto: Boolean = false) {
         when {
             ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
@@ -277,28 +243,29 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun startAutoRecord() {
-        startRecording(seconds = recordSeconds)
-    }
-
-    private fun startManualRecord() {
-        startRecording(seconds = recordSeconds)
-    }
+    private fun startAutoRecord() { startRecording(seconds = recordSeconds) }
+    private fun startManualRecord() { startRecording(seconds = recordSeconds) }
 
     private fun startRecording(seconds: Int) {
-        if (mediaRecorder != null) return   // already recording
+        if (mediaRecorder != null) return
 
         val dir = filesDir.resolve("audio").also { it.mkdirs() }
         val file = File(dir, "audio_${System.currentTimeMillis()}.3gp")
         currentAudioPath = file.absolutePath
 
-        mediaRecorder = MediaRecorder().apply {
-            setAudioSource(MediaRecorder.AudioSource.MIC)
-            setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
-            setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
-            setOutputFile(file.absolutePath)
-            prepare()
-            start()
+        try {
+            mediaRecorder = MediaRecorder().apply {
+                setAudioSource(MediaRecorder.AudioSource.MIC)
+                setOutputFormat(MediaRecorder.OutputFormat.THREE_GPP)
+                setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB)
+                setOutputFile(file.absolutePath)
+                prepare()
+                start()
+            }
+        } catch (e: Exception) {
+            mediaRecorder = null
+            Toast.makeText(this, "녹음 시작 실패", Toast.LENGTH_SHORT).show()
+            return
         }
 
         binding.cardRecordingStatus.visibility = View.VISIBLE
@@ -309,9 +276,7 @@ class MainActivity : AppCompatActivity() {
                 val s = (remaining / 1000).toInt() + 1
                 binding.tvRecordingStatus.text = "🎤 녹음 중... ${s}초"
             }
-            override fun onFinish() {
-                stopRecording(save = true)
-            }
+            override fun onFinish() { stopRecording(save = true) }
         }.start()
     }
 
@@ -319,12 +284,7 @@ class MainActivity : AppCompatActivity() {
         countDownTimer?.cancel()
         countDownTimer = null
 
-        try {
-            mediaRecorder?.apply {
-                stop()
-                release()
-            }
-        } catch (_: Exception) { }
+        try { mediaRecorder?.apply { stop(); release() } } catch (_: Exception) {}
         mediaRecorder = null
 
         binding.cardRecordingStatus.visibility = View.GONE
@@ -338,8 +298,6 @@ class MainActivity : AppCompatActivity() {
         currentAudioPath = null
     }
 
-    // ─── Audio Playback ──────────────────────────────────────
-
     private fun playLatestAudio() {
         val path = audioPaths.lastOrNull() ?: return
         mediaPlayer?.release()
@@ -348,21 +306,27 @@ class MainActivity : AppCompatActivity() {
         try {
             mediaPlayer = MediaPlayer().apply {
                 setDataSource(path)
-                prepare()
-                start()
-                binding.btnPlayVoice.text = "⏸  재생 중..."
-                setOnCompletionListener {
+                setOnPreparedListener { mp ->
+                    mp.start()
+                    binding.btnPlayVoice.text = "⏸  재생 중..."
+                }
+                setOnCompletionListener { mp ->
                     binding.btnPlayVoice.text = "▶  음성 재생"
-                    release()
+                    mp.release()
                     mediaPlayer = null
                 }
+                setOnErrorListener { mp, _, _ ->
+                    binding.btnPlayVoice.text = "▶  음성 재생"
+                    mp.release()
+                    mediaPlayer = null
+                    true
+                }
+                prepareAsync()
             }
         } catch (e: Exception) {
             Toast.makeText(this, "음성 재생 실패", Toast.LENGTH_SHORT).show()
         }
     }
-
-    // ─── Persistence ─────────────────────────────────────────
 
     private fun saveRecord() {
         lifecycleScope.launch {
@@ -375,8 +339,6 @@ class MainActivity : AppCompatActivity() {
             )
         }
     }
-
-    // ─── Clear ───────────────────────────────────────────────
 
     private fun confirmClearAll() {
         AlertDialog.Builder(this)
