@@ -121,12 +121,8 @@ class MainActivity : AppCompatActivity() {
 
                 updateStatusUI()
 
-                if (audioPaths.isNotEmpty()) {
-                    // 앱 실행 시 저장된 음성 자동 재생
-                    binding.root.postDelayed({ playLatestAudio() }, 400)
-                } else {
-                    scheduleAutoRecord()
-                }
+                // 항상 자동 녹음 시작 (기존 음성은 버튼 클릭 시에만 재생)
+                scheduleAutoRecord()
             } else {
                 scheduleAutoRecord()
             }
