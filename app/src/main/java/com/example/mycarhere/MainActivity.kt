@@ -24,6 +24,8 @@ import com.example.mycarhere.Prefs.allowMultiLocation
 import com.example.mycarhere.Prefs.allowMultiPhoto
 import com.example.mycarhere.Prefs.allowMultiVoice
 import com.example.mycarhere.Prefs.recordSeconds
+import com.example.mycarhere.Prefs.autoRecordOnLaunch
+import com.example.mycarhere.Prefs.autoPlayOnLaunch
 import com.example.mycarhere.databinding.ActivityMainBinding
 import kotlinx.coroutines.launch
 import java.io.File
@@ -121,10 +123,16 @@ class MainActivity : AppCompatActivity() {
 
                 updateStatusUI()
 
-                // 항상 자동 녹음 시작 (기존 음성은 버튼 클릭 시에만 재생)
-                scheduleAutoRecord()
+                // 설정에 따라 자동 재생
+                if (autoPlayOnLaunch && audioPaths.isNotEmpty()) {
+                    binding.root.postDelayed({ playLatestAudio() }, 400)
+                }
+                // 설정에 따라 자동 녹음
+                if (autoRecordOnLaunch) {
+                    scheduleAutoRecord()
+                }
             } else {
-                scheduleAutoRecord()
+                if (autoRecordOnLaunch) scheduleAutoRecord()
             }
         }
     }

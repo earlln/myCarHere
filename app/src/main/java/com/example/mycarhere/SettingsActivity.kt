@@ -9,6 +9,8 @@ import com.example.mycarhere.Prefs.allowMultiLocation
 import com.example.mycarhere.Prefs.allowMultiPhoto
 import com.example.mycarhere.Prefs.allowMultiVoice
 import com.example.mycarhere.Prefs.recordSeconds
+import com.example.mycarhere.Prefs.autoRecordOnLaunch
+import com.example.mycarhere.Prefs.autoPlayOnLaunch
 import com.example.mycarhere.databinding.ActivitySettingsBinding
 
 class SettingsActivity : AppCompatActivity() {
@@ -29,6 +31,8 @@ class SettingsActivity : AppCompatActivity() {
         binding.switchMultiLocation.isChecked = allowMultiLocation
         binding.switchMultiPhoto.isChecked = allowMultiPhoto
         binding.switchMultiVoice.isChecked = allowMultiVoice
+        binding.switchAutoRecord.isChecked = autoRecordOnLaunch
+        binding.switchAutoPlay.isChecked = autoPlayOnLaunch
 
         binding.seekBarRecordTime.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(sb: SeekBar, progress: Int, fromUser: Boolean) {
@@ -48,6 +52,8 @@ class SettingsActivity : AppCompatActivity() {
             allowMultiLocation = binding.switchMultiLocation.isChecked
             allowMultiPhoto = binding.switchMultiPhoto.isChecked
             allowMultiVoice = binding.switchMultiVoice.isChecked
+            autoRecordOnLaunch = binding.switchAutoRecord.isChecked
+            autoPlayOnLaunch = binding.switchAutoPlay.isChecked
             Toast.makeText(this, "설정이 저장되었습니다", Toast.LENGTH_SHORT).show()
             finish()
         }
