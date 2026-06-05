@@ -31,9 +31,9 @@ object Prefs {
         get() = sp(this).getBoolean(KEY_MULTI_VOICE, false)
         set(v) = sp(this).edit().putBoolean(KEY_MULTI_VOICE, v).apply()
 
-    /** 앱 실행 시 자동 녹음 여부 (기본 ON) */
+    /** 앱 실행 시 자동 녹음 여부 (기본 OFF) */
     var Context.autoRecordOnLaunch: Boolean
-        get() = sp(this).getBoolean(KEY_AUTO_RECORD, true)
+        get() = sp(this).getBoolean(KEY_AUTO_RECORD, false)
         set(v) = sp(this).edit().putBoolean(KEY_AUTO_RECORD, v).apply()
 
     /** 앱 실행 시 기존 음성 자동 재생 여부 (기본 OFF) */
